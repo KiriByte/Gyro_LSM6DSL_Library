@@ -1,0 +1,137 @@
+#pragma once
+#include "stm32f4xx_hal.h"
+
+#define DEVICE_ADDRESS 0x6B << 1
+#define WHO_I_AM 0x0F
+#define WHO_I_AM_reg 0x6A
+#define STATUS_REG 0x1E
+
+#define CTRL1_XL 0x10
+#define CTRL2_G 0x11
+#define CTRL3_C 0x12
+#define CTRL4_C 0x13
+#define CTRL5_C 0x14
+#define CTRL6_C 0x15
+#define CTRL7_G 0x16
+#define CTRL8_XL 0x17
+#define CTRL9_XL 0x18
+#define CTRL10_C 0x19
+
+#define OUTX_L_G 0x22
+#define OUTX_H_G 0x23
+#define OUTY_L_G 0x24
+#define OUTY_H_G 0x25
+#define OUTZ_L_G 0x26
+#define OUTZ_H_G 0x27
+
+#define OUT_TEMP_L 0x20
+#define OUT_TEMP_H 0x21
+
+#define HP_FILTER_MASK 0x40
+#define HP_FILTER_ENABLED 0x40
+#define HP_FILTER_DISABLED 0x00
+#define HP_FILTER_BANDWIDTH_MASK 0x30
+
+#define LP_FILTER_MASK 0x02
+#define LP_FILTER_ENABLED 0x02
+#define LP_FILTER_DISABLED 0x00
+#define LP_FILTER_BANDWIDTH_MASK 0x03
+
+#define GYRO_ODR_MASK 0xF0
+
+#define GYRO_FULL_SCALE_SELECT_MASK 0x0F
+
+#define GYRO_HIGH_PERFOMANCE_MODE_SELECT 0x80
+
+#define Gyro_DFU_ENABLE 0x64
+
+typedef enum
+{
+    RESULT_OK,
+    RESULT_ERROR,
+    RESULT_WHO_I_AM_ERROR
+} LSM6DSL_RESULT;
+
+typedef enum
+{
+    GYRO_ODR_POWER_DOWN,
+    GYRO_ODR_12HZ,
+    GYRO_ODR_26HZ,
+    GYRO_ODR_52HZ,
+    GYRO_ODR_104HZ,
+    GYRO_ODR_208HZ,
+    GYRO_ODR_416HZ,
+    GYRO_ODR_833HZ,
+    GYRO_ODR_1666HZ,
+    GYRO_ODR_3332HZ,
+    GYRO_ODR_6664HZ
+} LSM6DSL_GYRO_ODR;
+
+typedef enum
+{
+    GYRO_FILTER_SELECT_NONE_FILTER,
+    GYRO_FILTER_SELECT_HP_FILTER,
+    GYRO_FILTER_SELECT_LP_FILTER,
+    GYRO_FILTER_SELECT_HP_LP_FILTER
+} LSM6DSL_GYRO_FILTER_SELECT;
+
+typedef enum
+{
+    GYRO_LPF1_BANDWIDTH_SELECT_ONE,
+    GYRO_LPF1_BANDWIDTH_SELECT_TWO,
+    GYRO_LPF1_BANDWIDTH_SELECT_THREE,
+    GYRO_LPF1_BANDWIDTH_SELECT_FOUR
+} LSM6DSL_GYRO_LPF1_BANDWIDTH_SELECT;
+
+typedef enum
+{
+    GYRO_HP_FILTER_BANDWITDTH_SELECT_16 = 0x00,
+    GYRO_HP_FILTER_BANDWITDTH_SELECT_65 = 0x10,
+    GYRO_HP_FILTER_BANDWITDTH_SELECT_260 = 0x20,
+    GYRO_HP_FILTER_BANDWITDTH_SELECT_1040 = 0x30,
+} LSM6DSL_GYRO_HP_FILTER_BANDWITDTH_SELECT;
+
+typedef enum
+{
+    GYRO_FULL_SCALE_SELECT_125 = 0x02,
+    GYRO_FULL_SCALE_SELECT_250 = 0x00,
+    GYRO_FULL_SCALE_SELECT_500 = 0x04,
+    GYRO_FULL_SCALE_SELECT_1000 = 0x08,
+    GYRO_FULL_SCALE_SELECT_2000 = 0x0C
+} LSM6DSL_GYRO_FULL_SCALE_SELECT;
+
+typedef enum
+{
+    GYRO_HIGH_PERFOMANCE_MODE_ENABLED,
+    GYRO_HIGH_PERFOMANCE_MODE_DISABLED
+} LSM6DSL_GYRO_HIGH_PERFOMANCE_MODE;
+
+typedef struct
+{
+
+    LSM6DSL_GYRO_ODR odr;
+    LSM6DSL_GYRO_FILTER_SELECT filter_select;
+    LSM6DSL_GYRO_HIGH_PERFOMANCE_MODE high_perfomance_mode_select;
+    LSM6DSL_GYRO_LPF1_BANDWIDTH_SELECT lpf1_bandwidth_select;
+    LSM6DSL_GYRO_FULL_SCALE_SELECT full_scale_select;
+    LSM6DSL_GYRO_HP_FILTER_BANDWITDTH_SELECT hpf_bandwidth_select;
+    I2C_HandleTypeDef *i2c;
+
+} LSM6DSL_CONFIG;
+
+LSM6DSL_RESULT LSM6DSL_Init(LSM6DSL_CONFIG *config);
+int16_t Gyro_getX(LSM6DSL_CONFIG *config);
+int16_t Gyro_getY(LSM6DSL_CONFIG *config);
+int16_t Gyro_getZ(LSM6DSL_CONFIG *config);
+float Gyro_Convert(LSM6DSL_CONFIG *config, int16_t value);
+int16_t Read_temp(LSM6DSL_CONFIG *config);
+void Gyro_Calibrate(LSM6DSL_CONFIG *config, float *buffer);
+
+void Gyro_Disable(LSM6DSL_CONFIG *config);
+void Gyro_Enable(LSM6DSL_CONFIG *config);
+void Gyro_Disable_Filters(LSM6DSL_CONFIG *config);
+void Gyro_Enable_HP_Filter(LSM6DSL_CONFIG *config);
+void Gyro_Enable_LP_Filter(LSM6DSL_CONFIG *config);
+void Gyro_Full_Scale_Select(LSM6DSL_CONFIG *config);
+void Gyro_High_Perfomance_Mode_Select(LSM6DSL_CONFIG *config);
+void Gyro_BDU_Enable(LSM6DSL_CONFIG *config);
